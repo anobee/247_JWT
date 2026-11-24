@@ -56,6 +56,12 @@ async function updateKomik(req, res) {
     }
 }
 
+async function deletekomik(req,res){
+    const [id] = req.params
+    try{
+        const komik = await
+    }
+}
 
 module.exports = {
     getAllKomik,
