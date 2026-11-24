@@ -1,3 +1,4 @@
+
 const db = require("../models");
 const Komik = require("../models/komik")(db.sequelize, db.Sequelize.DataTypes);
 
@@ -16,9 +17,11 @@ async function getKomikById(req, res) {
     const { id } = req.params;
     try {
         const komik = await Komik.findByPk(id);
+
         if (!komik) {
             return res.status(404).json({ message: "Komik not found" });
         }
+
         res.status(200).json(komik);
     } catch (err) {
         console.error("Error fetching komik:", err);
@@ -27,9 +30,15 @@ async function getKomikById(req, res) {
 }
 
 async function createKomik(req, res) {
-    const { title, description, author } = req.body;    
+    const { title, description, author } = req.body;
+
     try {
-        const newKomik = await Komik.create({ title, description, author });
+        const newKomik = await Komik.create({
+            title,
+            description,
+            author
+        });
+
         res.status(201).json(newKomik);
     } catch (err) {
         console.error("Error creating komik:", err);
@@ -40,15 +49,20 @@ async function createKomik(req, res) {
 async function updateKomik(req, res) {
     const { id } = req.params;
     const { title, description, author } = req.body;
+
     try {
         const komik = await Komik.findByPk(id);
+
         if (!komik) {
             return res.status(404).json({ message: "Komik not found" });
         }
+
         komik.title = title;
         komik.description = description;
         komik.author = author;
+
         await komik.save();
+
         res.status(200).json(komik);
     } catch (err) {
         console.error("Error updating komik:", err);
@@ -56,10 +70,25 @@ async function updateKomik(req, res) {
     }
 }
 
-async function deletekomik(req,res){
-    const [id] = req.params
-    try{
-        const komik = await
+async function deleteKomik(req, res) {
+    const { id } = req.params;
+
+    try {
+        const komik = await Komik.findByPk(id);
+
+        if (!komik) {
+            return res.status(404).json({ message: "Komik not found" });
+        }
+
+        await komik.destroy();
+
+        res.status(200).json({
+            message: "Komik deleted successfully"
+        });
+
+    } catch (err) {
+        console.error("Error deleting komik:", err);
+        res.status(500).json({ message: "failed to delete komik" });
     }
 }
 
@@ -67,5 +96,6 @@ module.exports = {
     getAllKomik,
     getKomikById,
     createKomik,
-    updateKomik
+    updateKomik,
+    deleteKomik
 };

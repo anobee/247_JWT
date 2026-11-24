@@ -24,7 +24,12 @@ async function registerUser(req, res) {
         data: { id:user, email:user.email },
      });
   }
+  catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 }
+
 async function login(req, res) {
     try{
         const {email,password}=req.body;
