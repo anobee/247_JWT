@@ -1,13 +1,11 @@
-
 const db = require("../models");
-const Komik = require("../models/komik")(db.sequelize, db.Sequelize.DataTypes);
+const Komik = db.Komik;
 
 async function getAllKomik(req, res) {
     try {
         const komiks = await Komik.findAll();
         res.status(200).json(komiks);
-    }
-    catch (error) {
+    } catch (error) {
         console.error("Error fetching komiks:", error);
         res.status(500).json({ message: "Internal server error" });
     }
@@ -15,13 +13,14 @@ async function getAllKomik(req, res) {
 
 async function getKomikById(req, res) {
     const { id } = req.params;
+    if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+    }
     try {
         const komik = await Komik.findByPk(id);
-
         if (!komik) {
             return res.status(404).json({ message: "Komik not found" });
         }
-
         res.status(200).json(komik);
     } catch (err) {
         console.error("Error fetching komik:", err);
@@ -31,14 +30,11 @@ async function getKomikById(req, res) {
 
 async function createKomik(req, res) {
     const { title, description, author } = req.body;
-
+    if (!title || !author) {
+        return res.status(400).json({ message: "Title and author are required" });
+    }
     try {
-        const newKomik = await Komik.create({
-            title,
-            description,
-            author
-        });
-
+        const newKomik = await Komik.create({ title, description, author });
         res.status(201).json(newKomik);
     } catch (err) {
         console.error("Error creating komik:", err);
@@ -48,21 +44,19 @@ async function createKomik(req, res) {
 
 async function updateKomik(req, res) {
     const { id } = req.params;
+    if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+    }
     const { title, description, author } = req.body;
-
     try {
         const komik = await Komik.findByPk(id);
-
         if (!komik) {
             return res.status(404).json({ message: "Komik not found" });
         }
-
-        komik.title = title;
-        komik.description = description;
-        komik.author = author;
-
+        if (title !== undefined) komik.title = title;
+        if (description !== undefined) komik.description = description;
+        if (author !== undefined) komik.author = author;
         await komik.save();
-
         res.status(200).json(komik);
     } catch (err) {
         console.error("Error updating komik:", err);
@@ -72,20 +66,16 @@ async function updateKomik(req, res) {
 
 async function deleteKomik(req, res) {
     const { id } = req.params;
-
+    if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+    }
     try {
         const komik = await Komik.findByPk(id);
-
         if (!komik) {
             return res.status(404).json({ message: "Komik not found" });
         }
-
         await komik.destroy();
-
-        res.status(200).json({
-            message: "Komik deleted successfully"
-        });
-
+        res.status(200).json({ message: "Komik deleted successfully" });
     } catch (err) {
         console.error("Error deleting komik:", err);
         res.status(500).json({ message: "failed to delete komik" });

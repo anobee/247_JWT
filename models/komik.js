@@ -25,4 +25,4 @@ const komikModel = (sequelize, DataTypes) => {
   return Komik;
 };
 
-export default komikModel;
+module.exports = komikModel;
