@@ -1,7 +1,6 @@
 const db = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { use } = require("react");
 const User = db.User;
 
 async function registerUser(req, res) {
@@ -20,6 +19,7 @@ async function registerUser(req, res) {
         password: hashedPassword,
     });
     return res.status(201).json({ 
+      
         message: "User registered successfully",
         data: { id:user, email:user.email },
      });
